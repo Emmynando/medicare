@@ -1,4 +1,23 @@
 import { ReactNode } from "react";
+
+export interface IIdentificationInfo {
+  identificationNumber: string;
+  identificationType: string;
+}
+export interface IMedicalInfo {
+  allergies: string;
+  familyMedicationHistory: string;
+  currentMedication: string;
+  medicalRecords: string;
+}
+export interface IPersonalInfo {
+  gender: string;
+  occupation: string;
+  birthdate: string;
+  emergencyContact: string;
+  address: string;
+}
+
 export interface InputFieldProps {
   id?: string;
   name: string;
@@ -12,4 +31,5 @@ export interface InputFieldProps {
   disabled?: boolean;
   isValid?: boolean;
   error?: string;
+  max?: string;
 }

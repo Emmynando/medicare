@@ -16,6 +16,7 @@ const InputField = ({
   disabled,
   isValid,
   error,
+  max,
 }: InputFieldProps) => {
   const [passwordIsVisible, setPasswordIsVisible] = useState(false);
 
@@ -23,7 +24,7 @@ const InputField = ({
     light: `bg-white border ${
       isValid ? "border-medium-green" : "border-2 border-red-600"
     } text-gray-700 placeholder:text-gray-400`,
-    dark: "bg-dark-gray  border border-gray-800 text-gray-200 placeholder:text-[#4a4a4a]",
+    dark: "bg-dark-gray border border-gray-800 text-gray-200 placeholder:text-[#4a4a4a]",
   };
 
   const togglePasswordVisibility = () => setPasswordIsVisible((prev) => !prev);
@@ -35,6 +36,7 @@ const InputField = ({
           {icon}
         </div>
         <input
+          max={max}
           type={
             type === "password"
               ? passwordIsVisible

@@ -78,6 +78,7 @@ export default function Login() {
     try {
       console.log(formData);
     } catch (error) {
+      // if(error && error?.statusCode === 409)
       console.log(error);
     }
   }

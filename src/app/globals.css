@@ -80,6 +80,9 @@ input[type="number"] {
   .container {
     @apply text-2xl text-3xl text-4xl font-semibold;
   }
+  .header {
+    @apply text-xl text-2xl text-3xl font-semibold;
+  }
   .slug {
     @apply text-sm font-normal text-green-300;
   }
