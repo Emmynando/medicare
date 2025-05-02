@@ -7,8 +7,15 @@ import { IPersonalInfo, IMedicalInfo, IIdentificationInfo } from "@/constants";
 import MedicalInfo from "@/component/Layout/Auth/Register/MedicalInfo";
 import IdentificationInfo from "@/component/Layout/Auth/Register/VerifcationInfo";
 import SubmitButton from "@/component/UI/elements/SubmitButton";
+import ConsentInfo from "@/component/Layout/Auth/Register/ConsentInfo";
+import { validator } from "@/lib/validator";
 
 export default function Register() {
+  const [consentData, setConsentData] = useState({
+    disclosureConsent: false,
+    termsAgreement: false,
+  });
+  const [allConsentGiven, setAllConsentGiven] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedBackFile] = useState<File | null>(null);
   const { formData: personalFormData, handleChange: handlePersonalChange } =
@@ -54,6 +61,21 @@ export default function Register() {
     }
   }
 
+  const handleConsentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+
+    const newConsents = {
+      ...consentData,
+      [name]: checked,
+    };
+
+    setConsentData(newConsents);
+    // Check if both are true
+    setAllConsentGiven(
+      consentData.disclosureConsent && newConsents.termsAgreement
+    );
+  };
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData();
@@ -64,26 +86,8 @@ export default function Register() {
       formData.append("idImage", selectedFile);
     }
 
-    if (!personalFormData || !idFormData || !selectedFile) {
+    if (!personalFormData || !idFormData || !selectedFile || !allConsentGiven) {
       console.log("some fields are missing");
-      return;
-    }
-
-    if (personalFormData.birthdate) {
-      const birthdate = new Date(personalFormData.birthdate);
-      const today = new Date();
-
-      // Zero out the time part for an accurate date-only comparison
-      today.setHours(0, 0, 0, 0);
-
-      if (birthdate > today) {
-        console.log("Invalid Birthdate");
-        return;
-      }
-    }
-
-    if (personalFormData.emergencyContact.length !== 10) {
-      console.log("Invalid Energency Contact");
       return;
     }
     if (selectedFile) {
@@ -101,20 +105,42 @@ export default function Register() {
         return;
       }
 
+      const isValidbirthday = validator.validatebirthdate(
+        personalFormData.birthdate
+      );
+      const isValidEmergencyContact = validator.validatePhoneNumber(
+        personalFormData.emergencyContact
+      );
+      const isValidFile = validator.validateFileType(selectedFile);
+      if (!isValidbirthday) {
+        console.log("invalid birthdate");
+        return;
+      }
+
+      if (!isValidEmergencyContact) {
+        console.log("Invalid Contact");
+        return;
+      }
+      if (!isValidFile) {
+        console.log("Invalid File");
+        return;
+      }
+
       // Optional: Check file extension
-      const validExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-      const fileExtension = selectedFile.name.split(".").pop()?.toLowerCase();
-      if (!fileExtension || !validExtensions.includes(`.${fileExtension}`)) {
-        console.log("Invalid file extension. Please upload an image.");
-        return;
-      }
-      // Optional: Check file size (e.g., 5MB limit)
-      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-      if (selectedFile.size > maxSize) {
-        console.log("File is too large. Maximum size is 5MB.");
-        return;
-      }
+      //   const validExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+      //   const fileExtension = selectedFile.name.split(".").pop()?.toLowerCase();
+      //   if (!fileExtension || !validExtensions.includes(`.${fileExtension}`)) {
+      //     console.log("Invalid file extension. Please upload an image.");
+      //     return;
+      //   }
+      //   // Optional: Check file size (e.g., 5MB limit)
+      //   const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      //   if (selectedFile.size > maxSize) {
+      //     console.log("File is too large. Maximum size is 5MB.");
+      //     return;
+      //   }
     }
+    console.log(personalFormData);
 
     // try {
     //   const response = await fetch("/api/register", {
@@ -154,6 +180,10 @@ export default function Register() {
           formData={idFormData}
           checkValidation={handleIDChange}
           selectedFile={selectedFile}
+        />
+        <ConsentInfo
+          consentData={consentData}
+          onConsentChange={handleConsentChange}
         />
         <div className="md:!w-[50%] lg:!w-[50%] mx-auto mb-[2rem] px-[1rem]">
           <SubmitButton isLoading={false}>Submit</SubmitButton>
