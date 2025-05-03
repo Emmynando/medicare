@@ -3,12 +3,37 @@ import { GiPoliceOfficerHead } from "react-icons/gi";
 import { MdContactEmergency } from "react-icons/md";
 import { FaAddressBook } from "react-icons/fa6";
 import { FaIdCard } from "react-icons/fa6";
+export const APPOINTMENTINFO = [
+  {
+    id: "ap1",
+    formLabel: "Reason for Appointment",
+    placeholder: "e.g Monthly Checkup",
+    type: "text",
+    name: "appointmentReason",
+  },
+  {
+    id: "ap2",
+    formLabel: "Additional Comment",
+    placeholder: "important info to note before appointment",
+    type: "text",
+    name: "appointmentComment",
+  },
+];
+export const APPOINTMENTDATEINFO = [
+  {
+    id: "ad1",
+    formLabel: "Expected Appointment Date",
+    type: "date",
+    name: "appointmentDate",
+  },
+];
+
 export const IDINFO = [
   {
     id: "ii1",
     formLabel: "Identification Number",
     placeholder: "med1234567890",
-    type: "tex",
+    type: "text",
     name: "identificationNumber",
     icon: <FaIdCard className="text-green-300" />,
   },

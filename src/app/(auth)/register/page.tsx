@@ -11,21 +11,18 @@ import ConsentInfo from "@/component/Layout/Auth/Register/ConsentInfo";
 import { validator } from "@/lib/validator";
 
 export default function Register() {
-  const [consentData, setConsentData] = useState({
-    disclosureConsent: false,
-    termsAgreement: false,
+  const {
+    formData: personalFormData,
+    handleChange: handlePersonalChange,
+    errors: personalFormErrors,
+    setErrors: setPersonalFormErrors,
+  } = useForm<IPersonalInfo>({
+    gender: "",
+    occupation: "",
+    birthdate: "",
+    emergencyContact: "",
+    address: "",
   });
-  const [allConsentGiven, setAllConsentGiven] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedFile, setSelectedBackFile] = useState<File | null>(null);
-  const { formData: personalFormData, handleChange: handlePersonalChange } =
-    useForm<IPersonalInfo>({
-      gender: "",
-      occupation: "",
-      birthdate: "",
-      emergencyContact: "",
-      address: "",
-    });
   const { formData: medicalFormData, handleChange: handleMedicalChange } =
     useForm<IMedicalInfo>({
       allergies: "",
@@ -38,6 +35,13 @@ export default function Register() {
       identificationNumber: "",
       identificationType: "",
     });
+  const [consentData, setConsentData] = useState({
+    disclosureConsent: false,
+    termsAgreement: false,
+  });
+  const [allConsentGiven, setAllConsentGiven] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedBackFile] = useState<File | null>(null);
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
@@ -49,17 +53,90 @@ export default function Register() {
     }
   };
 
-  function checkPersonalValidation(event: ChangeEvent<HTMLInputElement>) {
+  function checkPersonalValidation(
+    event: ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) {
     const { name, value } = event.target as any;
-    if (name === "emergencyContact") {
-      if (value?.length <= 10) {
-        handlePersonalChange(event);
-        // return;
-      }
-    } else {
-      handlePersonalChange(event);
+
+    // First update the form data (always do this first)
+    handlePersonalChange(event);
+
+    // Then handle validation for each field
+    let errorMessage = "";
+
+    // Validate based on field name
+    switch (name) {
+      case "emergencyContact":
+        // Only allow numbers
+        if (!/^\d*$/.test(value)) {
+          errorMessage = "Only numbers are allowed";
+        }
+        // Check length - assuming you want exactly 10 digits
+        else if (value.length > 0 && value.length !== 10) {
+          errorMessage = "Contact number must be 10 digits";
+        }
+        break;
+
+      case "occupation":
+        if (!value.trim()) {
+          errorMessage = "Occupation is required";
+        }
+        break;
+
+      case "birthdate":
+        if (!value) {
+          errorMessage = "Birth date is required";
+        } else {
+          const birthDate = new Date(value);
+          const today = new Date();
+          // Zero out the time for an accurate comparison
+          birthDate.setHours(0, 0, 0, 0);
+          today.setHours(0, 0, 0, 0);
+
+          if (birthDate > today) {
+            errorMessage = "Birth date cannot be in the future";
+          }
+        }
+        break;
+
+      case "address":
+        if (!value.trim()) {
+          errorMessage = "Address is required";
+        } else if (value.length < 10) {
+          errorMessage = "Please enter a complete address";
+        }
+        break;
+
+      case "gender":
+        if (!value || value === "Gender") {
+          errorMessage = "Please select your gender";
+        }
+        break;
+
+      default:
+        break;
     }
+
+    // Update the error state with your setErrors function from useForm
+    setPersonalFormErrors((prev) => ({
+      ...prev,
+      [name]: errorMessage || undefined,
+    }));
   }
+
+  // function checkPersonalValidation(event: ChangeEvent<HTMLInputElement>) {
+  //   const { name, value } = event.target as any;
+  //   if (name === "emergencyContact") {
+  //     if (value?.length <= 10) {
+  //       handlePersonalChange(event);
+  //       // return;
+  //     }
+  //   } else {
+  //     handlePersonalChange(event);
+  //   }
+  // }
 
   const handleConsentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
@@ -85,11 +162,16 @@ export default function Register() {
     if (selectedFile) {
       formData.append("idImage", selectedFile);
     }
-
-    if (!personalFormData || !idFormData || !selectedFile || !allConsentGiven) {
-      console.log("some fields are missing");
+    if (
+      Object.values(personalFormData).some((value) => !value) ||
+      Object.values(idFormData).some((value) => !value) ||
+      !selectedFile ||
+      !allConsentGiven
+    ) {
+      console.error("All fields must be filled.");
       return;
     }
+
     if (selectedFile) {
       // Check file MIME type
       const validImageTypes = [
@@ -125,20 +207,6 @@ export default function Register() {
         console.log("Invalid File");
         return;
       }
-
-      // Optional: Check file extension
-      //   const validExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-      //   const fileExtension = selectedFile.name.split(".").pop()?.toLowerCase();
-      //   if (!fileExtension || !validExtensions.includes(`.${fileExtension}`)) {
-      //     console.log("Invalid file extension. Please upload an image.");
-      //     return;
-      //   }
-      //   // Optional: Check file size (e.g., 5MB limit)
-      //   const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-      //   if (selectedFile.size > maxSize) {
-      //     console.log("File is too large. Maximum size is 5MB.");
-      //     return;
-      //   }
     }
     console.log(personalFormData);
 
@@ -170,6 +238,7 @@ export default function Register() {
         <PersonalInfo
           formData={personalFormData}
           checkValidation={checkPersonalValidation}
+          errors={personalFormErrors}
         />
         <MedicalInfo
           formData={medicalFormData}

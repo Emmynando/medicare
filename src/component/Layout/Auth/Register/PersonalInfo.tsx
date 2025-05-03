@@ -5,6 +5,7 @@ import SelectFields from "@/component/UI/elements/SelectField";
 
 interface PersonalInfoProps {
   formData: IPersonalInfo;
+  errors: Record<string, string>;
   checkValidation: (e: any) => void;
 }
 
@@ -16,6 +17,7 @@ const GENDEROPTIONS = [
 export default function PersonalInfo({
   formData,
   checkValidation,
+  errors,
 }: PersonalInfoProps) {
   return (
     <main className="space-y-6 p-6">
@@ -43,6 +45,10 @@ export default function PersonalInfo({
               theme="dark"
               max={field.max}
             />
+            {/* Error message display */}
+            {errors[field.name] && (
+              <p className="mt-1 text-sm text-red-500">{errors[field.name]}</p>
+            )}
           </div>
         ))}
         <SelectFields

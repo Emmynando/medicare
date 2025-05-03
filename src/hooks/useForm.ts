@@ -2,6 +2,9 @@
 import { ChangeEvent, useState } from "react";
 
 const useForm = <IFormData>(InitialData: IFormData) => {
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof IFormData, string>>
+  >({});
   const [formData, setFormData] = useState<IFormData>(InitialData);
   const [mediaPreview, setMediaPreview] = useState("");
 
@@ -31,8 +34,39 @@ const useForm = <IFormData>(InitialData: IFormData) => {
       });
     }
   };
+  const validate = (validationRules?: {
+    [key in keyof IFormData]?: (value: any) => string | null;
+  }) => {
+    if (!validationRules) return true;
 
-  return { mediaPreview, setMediaPreview, formData, setFormData, handleChange };
+    const newErrors: typeof errors = {};
+    let isValid = true;
+
+    Object.entries(validationRules).forEach(([fieldName, validateFn]) => {
+      const field = fieldName as keyof IFormData;
+      const validate = validateFn as (value: any) => string | null;
+
+      const error = validate(formData[field]);
+      if (error) {
+        newErrors[field] = error;
+        isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  return {
+    mediaPreview,
+    setMediaPreview,
+    formData,
+    setFormData,
+    handleChange,
+    errors,
+    validate,
+    setErrors,
+  };
 };
 
 export default useForm;

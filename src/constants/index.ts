@@ -1,5 +1,11 @@
 import { ReactNode } from "react";
 
+export interface IBookAppointment {
+  appointmentReason: string;
+  appointmentComment: string;
+  appointmentDate: string;
+  previousPhysician: string;
+}
 export interface IIdentificationInfo {
   identificationNumber: string;
   identificationType: string;
@@ -23,7 +29,7 @@ export interface InputFieldProps {
   name: string;
   placeholder: string;
   type: string;
-  value: string | number;
+  value: string | number | boolean;
   onChange: any;
   icon?: ReactNode;
   theme: string;
