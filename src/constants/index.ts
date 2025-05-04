@@ -29,7 +29,8 @@ export interface InputFieldProps {
   name: string;
   placeholder: string;
   type: string;
-  value: string | number | boolean;
+  value: string | number;
+  //@ts-ignore
   onChange: any;
   icon?: ReactNode;
   theme: string;

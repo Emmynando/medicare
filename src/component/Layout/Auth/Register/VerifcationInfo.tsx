@@ -7,7 +7,11 @@ import { FaUpload } from "react-icons/fa";
 
 interface PersonalInfoProps {
   formData: IIdentificationInfo;
-  checkValidation: (e: any) => void;
+  checkValidation: (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLSelectElement>
+  ) => void;
   handleFileSelect: () => void;
   selectedFile: File | null;
 }

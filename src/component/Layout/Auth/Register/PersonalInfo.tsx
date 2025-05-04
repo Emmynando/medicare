@@ -6,7 +6,11 @@ import SelectFields from "@/component/UI/elements/SelectField";
 interface PersonalInfoProps {
   formData: IPersonalInfo;
   errors: Record<string, string>;
-  checkValidation: (e: any) => void;
+  checkValidation: (
+    e:
+      | React.ChangeEvent<HTMLTextAreaElement>
+      | React.ChangeEvent<HTMLSelectElement>
+  ) => void;
 }
 
 const GENDEROPTIONS = [
@@ -39,7 +43,11 @@ export default function PersonalInfo({
               type={field.type}
               placeholder={field.placeholder}
               value={formData[field.name as keyof typeof formData]}
-              onChange={(e: any) => checkValidation(e)}
+              onChange={(
+                e:
+                  | React.ChangeEvent<HTMLTextAreaElement>
+                  | React.ChangeEvent<HTMLSelectElement>
+              ) => checkValidation(e)}
               ringColorClass="focus:ring-green-900"
               icon={field.icon}
               theme="dark"

@@ -1,6 +1,7 @@
 class Validator {
   constructor() {}
 
+  //@ts-ignore
   hasNonEmptyValues(obj: any) {
     const keys = Object.keys(obj);
     return Object.values(obj).every((value, index) => {
@@ -25,41 +26,6 @@ class Validator {
       return true;
     }
   }
-
-  // validatePin(pin: string) {
-  //   const isSixDigitsLong = pin?.length === 6;
-
-  //   const isValidDigits = /^[0-9]+?$/.test(pin);
-  //   if (!isSixDigitsLong) {
-  //     return "Pin must be 6 digits";
-  //   }
-  //   if (!isValidDigits) {
-  //     return "Pin must contain only numbers!";
-  //   }
-  // }
-
-  // validatePassword(password: string) {
-  //   const isAtLeastEightCharacters = password?.length >= 8;
-  //   const alphabetsCount = password.replace(/[^a-zA-Z]/g, "")?.length;
-  //   const numbersCount = password.replace(/[^0-9]/g, "")?.length;
-  //   const symbolCount = password.replace(/[a-zA-Z0-9]/g, "")?.length;
-
-  //   if (!isAtLeastEightCharacters) {
-  //     return "Password must be at least 8 characters long";
-  //   }
-
-  //   if (alphabetsCount < 3) {
-  //     return "Password must contain at least 3 alphabets";
-  //   }
-
-  //   if (numbersCount < 3) {
-  //     return "Password must contain at least 3 numbers";
-  //   }
-
-  //   if (symbolCount < 1) {
-  //     return "Passoword must contain at least one symbol";
-  //   }
-  // }
 
   validateEmail(email: string) {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

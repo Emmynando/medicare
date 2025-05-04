@@ -34,6 +34,7 @@ const useForm = <IFormData>(InitialData: IFormData) => {
       });
     }
   };
+  //@ts-ignore
   const validate = (validationRules?: {
     [key in keyof IFormData]?: (value: any) => string | null;
   }) => {
@@ -44,6 +45,7 @@ const useForm = <IFormData>(InitialData: IFormData) => {
 
     Object.entries(validationRules).forEach(([fieldName, validateFn]) => {
       const field = fieldName as keyof IFormData;
+      //@ts-ignore
       const validate = validateFn as (value: any) => string | null;
 
       const error = validate(formData[field]);

@@ -29,7 +29,7 @@ export default function BookAppointment() {
   function checkValidation(
     event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
   ) {
-    const { name, value } = event.target as any;
+    // const { name, value } = event.target as HTMLInputElement | ChangeEvent<HTMLSelectElement
 
     handleChange(event);
   }
@@ -85,7 +85,11 @@ export default function BookAppointment() {
               type={field.type}
               placeholder={field.placeholder}
               value={formData[field.name as keyof typeof formData]}
-              onChange={(e: any) => checkValidation(e)}
+              onChange={(
+                e:
+                  | React.ChangeEvent<HTMLInputElement>
+                  | ChangeEvent<HTMLSelectElement>
+              ) => checkValidation(e)}
               ringColorClass="focus:ring-green-900"
               theme="dark"
             />
@@ -105,7 +109,11 @@ export default function BookAppointment() {
               type={field.type}
               placeholder=""
               value={formData[field.name as keyof typeof formData]}
-              onChange={(e: any) => checkValidation(e)}
+              onChange={(
+                e:
+                  | React.ChangeEvent<HTMLInputElement>
+                  | ChangeEvent<HTMLSelectElement>
+              ) => checkValidation(e)}
               ringColorClass="focus:ring-green-900"
               theme="dark"
             />
@@ -117,7 +125,9 @@ export default function BookAppointment() {
           defaultValue=""
           selectOptions={PREVIOUSPHYSICIAN}
           value={formData.previousPhysician}
-          onChange={(e: any) => checkValidation(e)}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+            checkValidation(e)
+          }
         />
         <div className="pt-[1.5rem] md:col-span-2 lg:col-span-2">
           <SubmitButton isLoading={false}>Submit</SubmitButton>

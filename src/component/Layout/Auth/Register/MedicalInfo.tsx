@@ -4,7 +4,7 @@ import TextAreaField from "@/component/UI/elements/TextAreaFields";
 
 interface MedicalInfoProps {
   formData: IMedicalInfo;
-  checkValidation: (e: any) => void;
+  checkValidation: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
 export default function MedicalInfo({
@@ -31,7 +31,9 @@ export default function MedicalInfo({
               type={field.type}
               placeholder={field.placeholder}
               value={formData[field.name as keyof typeof formData]}
-              onChange={(e: any) => checkValidation(e)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                checkValidation(e)
+              }
               ringColorClass="focus:ring-green-900"
               //   icon={field.icon}
               theme="dark"

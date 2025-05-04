@@ -6,6 +6,7 @@ import Image from "next/image";
 import { FaUser } from "react-icons/fa";
 import { MdEmail, MdSmartphone } from "react-icons/md";
 import SubmitButton from "@/component/UI/elements/SubmitButton";
+import InputOTPComp from "@/component/UI/elements/InputOTPComp";
 
 const LOGINITEMS = [
   {
@@ -49,7 +50,7 @@ export default function Login() {
   });
 
   function checkValidation(event: ChangeEvent<HTMLInputElement>) {
-    const { name, value } = event.target as any;
+    const { name, value } = event.target as HTMLInputElement;
     if (name === "phone") {
       if (value?.length <= 10) {
         handleChange(event);
@@ -106,7 +107,9 @@ export default function Login() {
                   type={field.type}
                   placeholder={field.placeholder}
                   value={formData[field.name as keyof typeof formData]}
-                  onChange={(e: any) => checkValidation(e)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    checkValidation(e)
+                  }
                   ringColorClass="focus:ring-green-900"
                   icon={field.icon}
                   theme="dark"
@@ -130,6 +133,7 @@ export default function Login() {
           className="h-full"
         />
       </section>
+      <InputOTPComp />
     </main>
   );
 }

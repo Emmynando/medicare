@@ -58,7 +58,9 @@ export default function Register() {
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) {
-    const { name, value } = event.target as any;
+    const { name, value } = event.target as
+      | HTMLInputElement
+      | HTMLSelectElement;
 
     // First update the form data (always do this first)
     handlePersonalChange(event);
