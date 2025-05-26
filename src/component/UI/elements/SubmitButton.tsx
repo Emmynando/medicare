@@ -12,12 +12,6 @@ export default function SubmitButton({
   containerclass,
 }: SubmitButtonProps) {
   return (
-    // <button
-    //   className={`px-2 rounded-md w-full py-4 font-semibold cursor-pointer`
-    //     `${isLoading}`
-    //       ? `text-gray-400 bg-inherit`
-    //       : `bg-green-200 text-black font-semibold hover:text-green-200 hover:bg-inherit`
-    //   }
     <button
       className={`px-2 rounded-md w-full py-4 font-semibold cursor-pointer ${containerclass} ${
         isLoading
@@ -28,7 +22,7 @@ export default function SubmitButton({
       type="submit"
       onClick={onClick}
     >
-      {isLoading ? <span></span> : children}
+      {children}
     </button>
   );
 }

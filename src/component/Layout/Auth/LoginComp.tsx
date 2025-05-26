@@ -1,5 +1,6 @@
 "use client";
 import { ChangeEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import InputField from "@/component/UI/elements/InputField";
 import useForm from "@/hooks/useForm";
 import Image from "next/image";
@@ -7,6 +8,8 @@ import { FaUser } from "react-icons/fa";
 import { MdEmail, MdSmartphone } from "react-icons/md";
 import SubmitButton from "@/component/UI/elements/SubmitButton";
 import InputOTPComp from "@/component/UI/elements/InputOTPComp";
+import axios from "axios";
+import { baseUrl } from "@/lib/baseUrl";
 
 const LOGINITEMS = [
   {
@@ -42,7 +45,11 @@ interface ISignIn {
 }
 
 export default function Login() {
+  const router = useRouter();
+  const [showOtpbox, setShowOtpbox] = useState(false);
+  const [isSubmittingOtp, setIsSubmittingOtp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [otpValue, setOtpValue] = useState("");
   const { formData, handleChange } = useForm<ISignIn>({
     name: "",
     email: "",
@@ -63,6 +70,7 @@ export default function Login() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setIsLoading(true);
     if (!formData) {
       console.log("Invalided form data");
       return;
@@ -77,10 +85,54 @@ export default function Login() {
       return;
     }
     try {
-      console.log(formData);
+      const data = await axios.post(`${baseUrl}/auth`, formData);
+      console.log(data);
+      // store values in local storage
+      localStorage.setItem("userFormData", JSON.stringify(formData));
+
+      if (data.status !== 201) {
+        // if user does not exist
+        // redirect to registration page
+        router.push("/register");
+        return;
+      }
+      setShowOtpbox(true);
     } catch (error) {
-      // if(error && error?.statusCode === 409)
       console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleConfirmOtp() {
+    setIsSubmittingOtp(true);
+    const storedFormData = localStorage.getItem("userFormData");
+
+    if (!storedFormData) {
+      console.log("Error Getting Data");
+      return;
+    }
+    const parsedFormData = JSON.parse(storedFormData);
+    try {
+      if (otpValue.length < 6) {
+        console.log("Invalid OTP");
+        return;
+      }
+      const data = await axios.post(`${baseUrl}/auth/otp`, {
+        email: parsedFormData.email,
+        otp: otpValue,
+      });
+      // auth failed
+      if (data.status !== 201) {
+        console.log("Otp Verification failed");
+        return;
+      }
+      router.push("/");
+      setShowOtpbox(false);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsSubmittingOtp(false);
     }
   }
 
@@ -116,7 +168,9 @@ export default function Login() {
                 />
               </div>
             ))}
-            <SubmitButton isLoading={isLoading}>CONTINUE</SubmitButton>
+            <SubmitButton isLoading={isLoading}>
+              {isLoading ? "laoding" : "CONTINUE"}
+            </SubmitButton>
           </form>
         </div>
         <div>
@@ -133,7 +187,23 @@ export default function Login() {
           className="h-full"
         />
       </section>
-      <InputOTPComp />
+      {showOtpbox && (
+        <InputOTPComp
+          submittingOtp={isSubmittingOtp}
+          onClick={handleConfirmOtp}
+          OtpValue={otpValue}
+          setOtpValue={setOtpValue}
+        />
+      )}
+
+      {/* <InputOTPComp
+        submittingOtp={isSubmittingOtp}
+        onClick={handleConfirmOtp}
+        OtpValue={otpValue}
+        setOtpValue={setOtpValue}
+      /> */}
     </main>
   );
 }
+
+// 1098765432

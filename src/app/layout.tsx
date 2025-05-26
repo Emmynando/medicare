@@ -10,7 +10,7 @@ const fontSans = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: "Medicare",
-  description: "a Health Management System",
+  description: "A Health Management System",
 };
 
 export default function RootLayout({

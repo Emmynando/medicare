@@ -1,5 +1,24 @@
 import { ReactNode } from "react";
 
+type AppointmentStatus =
+  | "CONFIRMED"
+  | "PENDING"
+  | "ONGOING"
+  | "COMPLETED"
+  | "CANCELLED";
+export interface IAppointmentDetails {
+  appointmentStartDate: Date;
+  appointmentEndDate: Date;
+  reason: string;
+  comment: string;
+  physicianInCharge: string;
+  status: AppointmentStatus;
+}
+export interface IAppointmentModal {
+  appointmentDetails: IAppointmentDetails;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
 export interface IBookAppointment {
   appointmentReason: string;
   appointmentComment: string;

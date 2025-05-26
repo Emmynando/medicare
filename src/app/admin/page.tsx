@@ -7,15 +7,17 @@ import { BiSolidError } from "react-icons/bi";
 import { IoHourglassOutline } from "react-icons/io5";
 
 export default function AdminPage() {
-  const [appointmentSelected, setAppointmentSelected] = useState("all");
+  const [appointmentSelected, setAppointmentSelected] = useState<
+    "all" | "ongoing" | "cancelled"
+  >("all");
 
   const renderAppointmentTable = () => {
     switch (appointmentSelected) {
       case "all":
         return <AppointmentStatTable tableCaption="List of All Appointments" />;
-      case "pending":
+      case "ongoing":
         return (
-          <AppointmentStatTable tableCaption="List of Pending Appointments" />
+          <AppointmentStatTable tableCaption="List of Ongoing Appointments" />
         );
       case "cancelled":
         return (
@@ -45,9 +47,9 @@ export default function AdminPage() {
           icon={<IoHourglassOutline className="text-green-500" />}
           statsNumber={65}
           statsType="Total number of pending appointments"
-          onClick={() => setAppointmentSelected("pending")}
+          onClick={() => setAppointmentSelected("ongoing")}
           containerClass={
-            appointmentSelected === "pending"
+            appointmentSelected === "ongoing"
               ? "border border-white border-2"
               : ""
           }
