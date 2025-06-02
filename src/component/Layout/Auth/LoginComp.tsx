@@ -70,7 +70,7 @@ export default function Login() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setIsLoading(true);
+
     if (!formData) {
       console.log("Invalided form data");
       return;
@@ -84,8 +84,11 @@ export default function Login() {
       console.log("Invalid Fullname");
       return;
     }
+    setIsLoading(true);
     try {
-      const data = await axios.post(`${baseUrl}/auth`, formData);
+      const data = await axios.post(`${baseUrl}/auth`, formData, {
+        withCredentials: true,
+      });
       console.log(data);
       // store values in local storage
       localStorage.setItem("userFormData", JSON.stringify(formData));
@@ -118,16 +121,31 @@ export default function Login() {
         console.log("Invalid OTP");
         return;
       }
-      const data = await axios.post(`${baseUrl}/auth/otp`, {
-        email: parsedFormData.email,
-        otp: otpValue,
-      });
+      const data = await axios.post(
+        `${baseUrl}/auth/otp`,
+        {
+          email: parsedFormData.email,
+          otp: otpValue,
+        },
+        {
+          withCredentials: true,
+        }
+      );
       // auth failed
       if (data.status !== 201) {
         console.log("Otp Verification failed");
         return;
       }
-      router.push("/");
+      console.log(data);
+
+      if (data?.data?.payload.role === "SUPPORT_AGENT") {
+        router.push("/support_agent");
+        return;
+      } else if (data?.data?.payload.role === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
       setShowOtpbox(false);
     } catch (error) {
       console.log(error);
@@ -169,7 +187,7 @@ export default function Login() {
               </div>
             ))}
             <SubmitButton isLoading={isLoading}>
-              {isLoading ? "laoding" : "CONTINUE"}
+              {isLoading ? "loading" : "CONTINUE"}
             </SubmitButton>
           </form>
         </div>
@@ -207,3 +225,4 @@ export default function Login() {
 }
 
 // 1098765432
+// 232979
