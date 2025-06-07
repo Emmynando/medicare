@@ -35,12 +35,36 @@ export interface IMedicalInfo {
   currentMedication: string;
   medicalRecords: string;
 }
+
+export interface IMessagesProps {
+  id: string;
+  content: string;
+  senderRole: "USER" | "SUPPORT_AGENT";
+  timestamp: string;
+  isRead: boolean;
+  readAt?: string;
+  sender: {
+    id: string;
+    firstname: string;
+  };
+}
+
 export interface IPersonalInfo {
   gender: string;
   occupation: string;
   birthdate: string;
   emergencyContact: string;
   address: string;
+}
+
+export interface ISupportChatProps {
+  id: string;
+  // content: string;
+  status: string;
+  createdAt: string;
+  message: string;
+  assignedAgent?: string;
+  allMessages: IMessagesProps[];
 }
 
 export interface InputFieldProps {

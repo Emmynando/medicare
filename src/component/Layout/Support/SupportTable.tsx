@@ -7,8 +7,34 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ISupportChatProps } from "@/constants";
 
-export default function SupportTable() {
+export default function SupportTable({
+  id,
+  status,
+  createdAt,
+  assignedAgent,
+  message,
+  allMessages,
+}: ISupportChatProps) {
+  function convertDate(theDate: string) {
+    const date = new Date(theDate);
+    const hours = date.getHours().toString().padStart(2, "0"); // Local time
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+
+    const formatted = `${hours}:${minutes} ${day}/${month}`;
+    return formatted;
+    // return date.toLocaleString(undefined, {
+    //   hour: "2-digit",
+    //   minute: "2-digit",
+    //   day: "2-digit",
+    //   month: "2-digit",
+    //   hour12: false,
+    // });
+  }
+
   return (
     <main>
       <Table>
@@ -26,17 +52,49 @@ export default function SupportTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow>
-            <TableCell className="">INV001</TableCell>
-            <TableCell>Paid</TableCell>
-            <TableCell>Credit Card</TableCell>
-            <TableCell className="">$250.00</TableCell>
+          <TableRow key={id}>
+            <TableCell className="">{id}</TableCell>
+            <TableCell
+              className={`${status === "OPEN" && "text-green-500 font-bold"}`}
+            >
+              {status}
+            </TableCell>
+            <TableCell>{createdAt}</TableCell>
+            <TableCell className="">{message}</TableCell>
             <TableCell className="">
-              <button>OPEN</button>
+              {assignedAgent ?? "Not Assigned"}
+            </TableCell>
+            <TableCell className="">
+              <button
+                className="bg-green-200 px-2 py-1 rounded-md text-black text-semibold cursor-pointer"
+                disabled={status !== "OPEN"}
+              >
+                ACCEPT
+              </button>
             </TableCell>
           </TableRow>
         </TableBody>
       </Table>
+
+      {/* rendering all chats on a modal */}
+      <div className="fixed inset-0 h-full z-10 bg-black/60 flex items-center justify-center">
+        <div className="relative bg-dark-400 rounded-sm h-[50%] w-[80%] md:w-[50%] lg:w-[40%] py-2 px-1">
+          <h3 className="text-center mb-4">ALL MESSAGES</h3>
+          <ul className="space-y-2 h-[70%] overflow-y-auto ">
+            {allMessages.map((item) => (
+              <li key={item.id} className="">
+                {item.content}
+                <span className="text-[10px] text-gray-400 block">
+                  {convertDate(item.timestamp)}
+                </span>{" "}
+              </li>
+            ))}
+          </ul>
+          <button className="text-green-300 border-dark-200 border-2 w-max ml-[40%] px-2 py-1 cursor-pointer">
+            Enter Chat
+          </button>
+        </div>
+      </div>
     </main>
   );
 }

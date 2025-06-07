@@ -1,29 +1,25 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { baseUrl } from "@/lib/baseUrl";
 import { ChatStatusEnums } from "@/constants/enum";
-
-interface MessagesProps {
-  id: string;
-  senderRole: "USER" | "SUPPORT_AGENT";
-  timestamp: Date;
-  isRead: boolean;
-  readAt?: Date;
-  supportTicketId: string;
-  sender: string;
-}
+import { ISupportChatProps, IMessagesProps } from "@/constants";
 
 // Define the initial state of the message
 interface SupportChatProps {
-  chatID: string;
-  status: ChatStatusEnums | null;
-  createdAt: Date | null;
-  messages: MessagesProps[];
-  assignedTo?: String;
+  id: string;
+  status: ChatStatusEnums;
+  createdAt: string;
+  messages: IMessagesProps[];
+  assignedAgent?: string;
 }
 
-interface GetChatsResponse {
-  message: string;
-  data: SupportChatProps[];
+interface GetChatTicket {
+  tickets: SupportChatProps[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
 // Define API slice using the new baseQuery
@@ -39,7 +35,7 @@ export const supportChatApi = createApi({
     // },
   }),
   endpoints: (builder) => ({
-    getAllChats: builder.query<GetChatsResponse, void>({
+    getAllChats: builder.query<GetChatTicket, void>({
       query: () => `/tickets`,
       extraOptions: {
         refetchOnFocus: true,
