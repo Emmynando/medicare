@@ -8,6 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ISupportChatProps } from "@/constants";
+import { capitalize } from "@/lib/helperFunctions";
+import { GiCancel } from "react-icons/gi";
 
 export default function SupportTable({
   id,
@@ -16,6 +18,10 @@ export default function SupportTable({
   assignedAgent,
   message,
   allMessages,
+  clientName,
+  showModal,
+  onClick,
+  onChatEnter,
 }: ISupportChatProps) {
   function convertDate(theDate: string) {
     const date = new Date(theDate);
@@ -77,24 +83,40 @@ export default function SupportTable({
       </Table>
 
       {/* rendering all chats on a modal */}
-      <div className="fixed inset-0 h-full z-10 bg-black/60 flex items-center justify-center">
-        <div className="relative bg-dark-400 rounded-sm h-[50%] w-[80%] md:w-[50%] lg:w-[40%] py-2 px-1">
-          <h3 className="text-center mb-4">ALL MESSAGES</h3>
-          <ul className="space-y-2 h-[70%] overflow-y-auto ">
-            {allMessages.map((item) => (
-              <li key={item.id} className="">
-                {item.content}
-                <span className="text-[10px] text-gray-400 block">
-                  {convertDate(item.timestamp)}
-                </span>{" "}
-              </li>
-            ))}
-          </ul>
-          <button className="text-green-300 border-dark-200 border-2 w-max ml-[40%] px-2 py-1 cursor-pointer">
-            Enter Chat
-          </button>
+      {showModal && (
+        <div className="fixed inset-0 h-full z-10 bg-black/60 flex items-center justify-center">
+          <div className="relative bg-dark-400 rounded-sm h-[50%] w-[80%] md:w-[50%] lg:w-[40%] py-2 px-1">
+            <h3 className="text-center mb-4">ALL MESSAGES</h3>
+            <span
+              className="fixed left-[80%] md:left-[70%] lg:left-[65%] top-[28%] cursor-pointer"
+              onClick={onClick}
+            >
+              <GiCancel />
+            </span>
+            <ul className="space-y-2 h-[70%] overflow-y-auto ">
+              {allMessages.map((item) => (
+                <li key={item.id} className="">
+                  <span>
+                    <span className="text-base text-gray-400">
+                      {capitalize(clientName)}:
+                    </span>
+                    {item.content}
+                  </span>
+                  <span className="text-[10px] text-gray-600 block">
+                    {convertDate(item.timestamp)}
+                  </span>{" "}
+                </li>
+              ))}
+            </ul>
+            <button
+              className="text-green-300 border-dark-200 border-2 w-max ml-[40%] px-2 py-1 cursor-pointer"
+              onClick={onChatEnter}
+            >
+              Enter Chat
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </main>
   );
 }

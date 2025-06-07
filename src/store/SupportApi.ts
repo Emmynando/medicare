@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { baseUrl } from "@/lib/baseUrl";
 import { ChatStatusEnums } from "@/constants/enum";
-import { ISupportChatProps, IMessagesProps } from "@/constants";
+import { IUserProps, IMessagesProps } from "@/constants";
 
 // Define the initial state of the message
 interface SupportChatProps {
@@ -9,6 +9,7 @@ interface SupportChatProps {
   status: ChatStatusEnums;
   createdAt: string;
   messages: IMessagesProps[];
+  user: IUserProps;
   assignedAgent?: string;
 }
 

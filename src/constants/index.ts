@@ -59,12 +59,23 @@ export interface IPersonalInfo {
 
 export interface ISupportChatProps {
   id: string;
-  // content: string;
+  clientName: string;
   status: string;
   createdAt: string;
   message: string;
   assignedAgent?: string;
   allMessages: IMessagesProps[];
+  showModal: boolean;
+  onClick: () => void;
+  onOpenModal: () => void;
+  onChatEnter: () => void;
+}
+
+export interface IUserProps {
+  email: string;
+  firstName: string;
+  id: string;
+  lastName: string;
 }
 
 export interface InputFieldProps {
