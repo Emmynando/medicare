@@ -61,7 +61,6 @@ export default function Login() {
     if (name === "phone") {
       if (value?.length <= 10) {
         handleChange(event);
-        // return;
       }
     } else {
       handleChange(event);

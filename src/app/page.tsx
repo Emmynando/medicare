@@ -23,7 +23,7 @@ export default function Home() {
   const [showModal, setShowModal] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
   return (
-    <ProtectedRoute requiredRole={["ADMIN", "USER"]}>
+    <ProtectedRoute requiredRole={["ADMIN", "USER", "PHYSICIAN"]}>
       <div className="p-6">
         {openChat ? (
           <ChatBox onClick={() => setOpenChat(false)} />
