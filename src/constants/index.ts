@@ -45,7 +45,9 @@ export interface IMessagesProps {
   readAt?: string;
   sender: {
     id: string;
-    firstname: string;
+    firstName: string;
+    lastName: string;
+    role: string;
   };
 }
 

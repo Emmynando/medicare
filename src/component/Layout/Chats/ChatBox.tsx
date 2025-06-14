@@ -1,26 +1,48 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useChat } from "@/hooks/useChat";
 import { MdCancel } from "react-icons/md";
 import { IoSend } from "react-icons/io5";
+import { IMessagesProps } from "@/constants";
 
-export default function ChatBox({ onClick }: { onClick: () => void }) {
+interface ChatBoxProps {
+  onClick: () => void;
+  messagez: IMessagesProps[];
+  ticketId: string;
+}
+
+export default function ChatBox({ onClick, messagez }: ChatBoxProps) {
   const [input, setInput] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const { messages, sendMessage, joinRoom, leaveRoom, currentRoom } = useChat();
-  const [roomInput, setRoomInput] = useState("");
 
-  const handleJoin = () => {
-    if (roomInput.trim()) {
-      joinRoom(roomInput);
-    }
+  const formatTime = (timestamp: string) => {
+    return new Date(timestamp).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
   };
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messagesEndRef]);
 
-  const handleSend = () => {
-    if (input.trim()) {
-      sendMessage(input);
-      setInput("");
-    }
-  };
+  const handleSendMessage = useCallback(
+    (content: string) => {
+      if (currentRoom) {
+        sendMessage(content, currentRoom);
+        setInput("");
+        console.log("here");
+      }
+    },
+    [sendMessage, currentRoom]
+  );
+
+  // if (ticketsError) {
+  //   console.error('Tickets error:', ticketsError);
+  // }
+
   return (
     <div className="bg-white h-[20rem] w-[20rem] fixed right-[5%] bottom-[5%] rounded-lg z-2">
       <div className="relative">
@@ -35,15 +57,68 @@ export default function ChatBox({ onClick }: { onClick: () => void }) {
           <p className="text-black text-sm font-semibold text-center">Online</p>
         </div>
 
+        {/* Messages Container */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-50">
+          {messagez.length === 0 ? (
+            <div className="text-center text-gray-500 mt-8">
+              <p>No messages yet</p>
+            </div>
+          ) : (
+            messagez.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${
+                  message.senderRole === "USER"
+                    ? "justify-start"
+                    : "justify-end"
+                }`}
+              >
+                <div
+                  className={`max-w-[80%] px-3 py-2 rounded-lg ${
+                    message.senderRole === "USER"
+                      ? "bg-white text-gray-800 border border-gray-200"
+                      : "bg-blue-500 text-white"
+                  }`}
+                >
+                  <p className="text-sm break-words">
+                    <span
+                      className={`text-xs ${
+                        message.senderRole === "USER"
+                          ? "text-gray-500"
+                          : "text-blue-100"
+                      }`}
+                    >
+                      {message.sender.firstName}
+                    </span>
+                    : {message.content}
+                  </p>
+                  <div className="flex items-center justify-between mt-1">
+                    <span
+                      className={`text-xs ${
+                        message.senderRole === "USER"
+                          ? "text-gray-400"
+                          : "text-blue-100"
+                      }`}
+                    >
+                      {formatTime(message.timestamp)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
         <div className="border-t-black bg-gray-800 py-1 px-2 flex justify-between items-center gap-2 fixed w-[20rem] bottom-[5%] rounded-b-lg">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            onKeyDown={(e) => e.key === "Enter" && handleSendMessage}
             placeholder="Type a message..."
             className="flex-1 outline-none font-sm"
           />
-          <button onClick={handleSend}>
+          <button onClick={() => handleSendMessage(input)}>
             <IoSend className="text-green-400" />
           </button>
         </div>

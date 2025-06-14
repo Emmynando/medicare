@@ -1,64 +1,96 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import { baseUrl } from "@/lib/baseUrl";
 import { useGetAllChatsQuery } from "@/store/SupportApi";
 import SupportTable from "@/component/Layout/Support/SupportTable";
 import { convertDate } from "@/lib/helperFunctions";
 import ChatBox from "@/component/Layout/Chats/ChatBox";
+import { IMessagesProps } from "@/constants";
+import { useChat } from "@/hooks/useChat";
 
 export default function SupportAgent() {
+  const router = useRouter();
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showChatBox, setShowChatBox] = useState(false);
+  const [activeTicketMessages, setActiveTicketMessages] = useState<
+    IMessagesProps[]
+  >([]);
+  const [activeTicketId, setActiveTicketId] = useState<string | null>(null);
+  const { assignTicket, joinRoom, sendMessage, currentRoom, assignmentStatus } =
+    useChat();
 
+  // Check for active tickets on component mount
   useEffect(() => {
-    (async () => {
-      try {
-        const data = await axios.get(`${baseUrl}/support/tickets/me`, {
-          withCredentials: true,
-        });
-        if (data.data.tickets.length >= 1) {
-          setShowChatBox(true);
-          const activeTicket = await axios.get(
-            `${baseUrl}/support/tickets/${selectedTicketId}/messages`,
-            {
-              withCredentials: true,
-            }
-          );
-          console.log(activeTicket);
-          return;
-        }
-      } catch (error) {
-        console.error("Error fetching ticket:", error);
-      }
-    })();
-  }, [selectedTicketId]);
+    checkActiveTickets();
+  }, []);
 
   const { data: tickets, error } = useGetAllChatsQuery();
 
-  async function handleOpenModal(ticketId: string) {
+  const handleOpenModal = useCallback((ticketId: string) => {
     setShowModal(true);
     setSelectedTicketId(ticketId);
-  }
-  async function handleEnterChat() {
-    // if there is ongoing ticket
-    if (showChatBox) {
-      console.log("You have an active ticket");
-      return;
+  }, []);
+
+  const checkActiveTickets = useCallback(async () => {
+    try {
+      const response = await axios.get(`${baseUrl}/support/tickets/me`, {
+        withCredentials: true,
+      });
+
+      if (response.data.tickets.length >= 1) {
+        const activeTicket = response.data.tickets[0];
+        setActiveTicketId(activeTicket.id);
+        setShowChatBox(true);
+
+        // Fetch messages for the active ticket
+        await fetchTicketMessages(activeTicket.id);
+      }
+    } catch (error) {
+      console.error("Error fetching active tickets:", error);
     }
-    if (selectedTicketId) {
-      const data = await axios.post(
-        `${baseUrl}/support/tickets/${selectedTicketId}/assign`,
-        { ticketId: selectedTicketId },
+  }, [joinRoom]);
+
+  const fetchTicketMessages = async (ticketId: string) => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/support/tickets/${ticketId}/messages`,
         {
           withCredentials: true,
         }
       );
-      console.log(data);
+      setActiveTicketMessages(response.data || []);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
     }
+  };
+
+  if (error) {
+    console.log(error);
   }
+
+  const handleEnterChat = useCallback(async () => {
+    // if there is ongoing ticket
+    if (currentRoom) {
+      console.log("You have an active ticket");
+      return;
+    }
+
+    if (selectedTicketId) {
+      assignTicket(selectedTicketId);
+      joinRoom(selectedTicketId);
+      await fetchTicketMessages(selectedTicketId);
+
+      setShowModal(false);
+      setActiveTicketId(selectedTicketId);
+      setShowChatBox(true);
+      console.log(activeTicketMessages);
+      router.refresh();
+    }
+  }, [selectedTicketId, assignTicket, joinRoom, currentRoom]);
 
   return (
     <main>
@@ -85,7 +117,41 @@ export default function SupportAgent() {
       ) : (
         <p>No tickets found</p>
       )}
-      {showChatBox && <ChatBox onClick={handleEnterChat} />}
+      {/* {showChatBox && activeTicketId && (
+        <ChatBox
+          onClick={handleEnterChat}
+          messagez={activeTicketMessages}
+          ticketId={activeTicketId}
+        />
+      )} */}
     </main>
   );
 }
+
+// async function handleEnterChat() {
+//     // if there is ongoing ticket
+//     if (currentRoom) {
+//       console.log("You have an active ticket");
+//       return;
+//     }
+//     if (selectedTicketId) {
+//       assignTicket(selectedTicketId);
+//       joinRoom(selectedTicketId)
+//       setShowModal(false)
+//       // const data = await axios.post(
+//       //   `${baseUrl}/support/tickets/${selectedTicketId}/assign`,
+//       //   { ticketId: selectedTicketId },
+//       //   {
+//       //     withCredentials: true,
+//       //   }
+//       // );
+//       // if (data.data.success) {
+//       //   setActiveTicketId(selectedTicketId);
+//       //   setShowChatBox(true);
+//       //   setShowModal(false);
+
+//       //   // Fetch messages for the newly assigned ticket
+//       //   await fetchTicketMessages(selectedTicketId);
+//       // }
+//     }
+//   }
