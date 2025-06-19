@@ -15,7 +15,7 @@ export default function SupportTable({
   id,
   status,
   createdAt,
-  assignedAgent,
+  assignedAgentName,
   message,
   allMessages,
   clientName,
@@ -50,12 +50,15 @@ export default function SupportTable({
             </TableCell>
             <TableCell>{createdAt}</TableCell>
             <TableCell className="">{message}</TableCell>
-            <TableCell className="">
-              {assignedAgent ?? "Not Assigned"}
-            </TableCell>
+            <TableCell className="">{assignedAgentName}</TableCell>
+
             <TableCell className="">
               <button
-                className="bg-green-200 px-2 py-1 rounded-md text-black text-semibold cursor-pointer"
+                className={`px-2 py-1 rounded-md text-black text-semibold  ${
+                  status !== "OPEN"
+                    ? "bg-gray-800 cursor-not-allowed"
+                    : "bg-green-200 cursor-pointer"
+                }`}
                 disabled={status !== "OPEN"}
                 onClick={onOpenModal}
               >

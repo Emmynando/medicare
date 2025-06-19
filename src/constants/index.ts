@@ -38,6 +38,7 @@ export interface IMedicalInfo {
 
 export interface IMessagesProps {
   id: string;
+  ticketId?: string;
   content: string;
   senderRole: "USER" | "SUPPORT_AGENT";
   timestamp: string;
@@ -65,7 +66,7 @@ export interface ISupportChatProps {
   status: string;
   createdAt: string;
   message: string;
-  assignedAgent?: string;
+  assignedAgentName?: string;
   allMessages: IMessagesProps[];
   showModal: boolean;
   onClick: () => void;

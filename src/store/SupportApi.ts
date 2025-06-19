@@ -10,7 +10,11 @@ interface SupportChatProps {
   createdAt: string;
   messages: IMessagesProps[];
   user: IUserProps;
-  assignedAgent?: string;
+  assignedAgent?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
 }
 
 interface GetChatTicket {

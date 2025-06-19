@@ -4,6 +4,7 @@ import { useChat } from "@/hooks/useChat";
 import { MdCancel } from "react-icons/md";
 import { IoSend } from "react-icons/io5";
 import { IMessagesProps } from "@/constants";
+import { capitalize } from "@/lib/helperFunctions";
 
 interface ChatBoxProps {
   onClick: () => void;
@@ -11,10 +12,10 @@ interface ChatBoxProps {
   ticketId: string;
 }
 
-export default function ChatBox({ onClick, messagez }: ChatBoxProps) {
+export default function ChatBox({ onClick, messagez, ticketId }: ChatBoxProps) {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { messages, sendMessage, joinRoom, leaveRoom, currentRoom } = useChat();
+  const { sendMessage, currentRoom } = useChat();
 
   const formatTime = (timestamp: string) => {
     return new Date(timestamp).toLocaleTimeString("en-US", {
@@ -26,22 +27,32 @@ export default function ChatBox({ onClick, messagez }: ChatBoxProps) {
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messagesEndRef]);
+  }, [messagez]);
 
   const handleSendMessage = useCallback(
     (content: string) => {
       if (currentRoom) {
-        sendMessage(content, currentRoom);
-        setInput("");
-        console.log("here");
+        if (input.trim().length) {
+          sendMessage(ticketId, content);
+          setInput("");
+        }
       }
     },
-    [sendMessage, currentRoom]
+    [sendMessage, currentRoom, ticketId, input]
   );
 
-  // if (ticketsError) {
-  //   console.error('Tickets error:', ticketsError);
-  // }
+  // Get sender name safely
+  const getSenderName = (message: any): string => {
+    if (!message.sender) return "Unknown";
+
+    const firstName = message.sender.firstName || "";
+
+    if (firstName) {
+      return `${capitalize(firstName)}`;
+    }
+
+    return capitalize(firstName || "Unknown");
+  };
 
   return (
     <div className="bg-white h-[20rem] w-[20rem] fixed right-[5%] bottom-[5%] rounded-lg z-2">
@@ -58,7 +69,7 @@ export default function ChatBox({ onClick, messagez }: ChatBoxProps) {
         </div>
 
         {/* Messages Container */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-50">
+        <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-50 h-[14rem]">
           {messagez.length === 0 ? (
             <div className="text-center text-gray-500 mt-8">
               <p>No messages yet</p>
@@ -88,7 +99,7 @@ export default function ChatBox({ onClick, messagez }: ChatBoxProps) {
                           : "text-blue-100"
                       }`}
                     >
-                      {message.sender.firstName}
+                      {capitalize(message.sender.firstName)}
                     </span>
                     : {message.content}
                   </p>
